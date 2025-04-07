@@ -29,16 +29,6 @@ const pub = new Redis({
 // Mapa para llevar el registro de los usuarios conectados: userId -> socketId
 const userSockets = new Map();
 
-// Función para emitir la lista de usuarios en línea a todos los clientes
-// const broadcastOnlineUsers = async () => {
-//     // Aquí usamos los userIds registrados en el mapa
-//     const onlineUsers = Array.from(userSockets.keys());
-//     console.log("onlineUsers", onlineUsers)
-//     io.emit("onlineUsers", onlineUsers);
-// };
-
-
-
 const broadcastOnlineUsers = async () => {
     const onlineUsers = [];
   
@@ -64,13 +54,6 @@ const broadcastOnlineUsers = async () => {
 io.on("connection", (socket) => {
     console.log("🔹 Cliente conectado:", socket.id);
 
-    // Al registrar un usuario, se guarda en el mapa y se marca como online en Redis
-    //   socket.on("register", async (userId) => {
-    //     userSockets.set(userId, socket.id);
-    //     await pub.set(`userStatus:${userId}`, "online", "EX", 86400);
-    //     console.log(`Usuario ${userId} registrado y marcado online`);
-    //     broadcastOnlineUsers();
-    //   });
     socket.on("register", async (userData) => {
         const { id, diuc } = userData;
 
@@ -144,79 +127,6 @@ const PORT = process.env.WS_PORT || 4000;
 server.listen(PORT, () => {
     console.log(`✅ Servidor WebSocket corriendo en el puerto ${PORT}`);
 });
-
-
-
-
-
-
-
-
-
-// import express from "express";
-// import http from "http";
-// import { Server } from "socket.io";
-// import Redis from "ioredis";
-// import dotenv from "dotenv";
-
-// dotenv.config();
-
-// const app = express();
-// const server = http.createServer(app);
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*",
-//   },
-// });
-
-// // Configuración de Redis para Pub/Sub
-// const sub = new Redis({
-//   host: process.env.REDIS_HOST || "127.0.0.1",
-//   port: process.env.REDIS_PORT || 6379,
-// });
-
-// const userSockets = new Map(); // Relación userId -> socketId
-
-// // Escuchar conexiones de WebSocket
-// io.on("connection", (socket) => {
-//   console.log("🔹 Nuevo cliente conectado");
-
-//   // Registrar el usuario con su socket ID
-//   socket.on("register", (userId) => {
-//     userSockets.set(userId, socket.id);
-//   });
-
-//   // Eliminar el usuario cuando se desconecta
-//   socket.on("disconnect", () => {
-//     userSockets.forEach((socketId, userId) => {
-//       if (socketId === socket.id) {
-//         userSockets.delete(userId);
-//       }
-//     });
-//   });
-// });
-
-// // 🔹 Suscribirse al canal "logout" en Redis
-// sub.subscribe("logout");
-
-// sub.on("message", (channel, message) => {
-//   if (channel === "logout") {
-//     const { userId } = JSON.parse(message);
-//     const socketId = userSockets.get(userId);
-//     if (socketId) {
-//       io.to(socketId).emit("logout"); // 🔹 Notifica a la sesión anterior que debe cerrar
-//       console.log(`🔴 Cerrando sesión de usuario: ${userId}`);
-//     }
-//   }
-// });
-
-// // Iniciar el servidor WebSocket
-// const PORT = process.env.WS_PORT || 4000;
-// server.listen(PORT, () => {
-//   console.log(`✅ Servidor WebSocket corriendo en el puerto ${PORT}`);
-// });
-
 
 
 
