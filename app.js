@@ -12,7 +12,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "*", // Permitir conexiones desde cualquier origen
-    },
+    },    
+    path: "/api/socket", // 👈 importante
 });
 
 // Crear clientes Redis para suscripción y publicación
